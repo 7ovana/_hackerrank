@@ -1,4 +1,4 @@
-from itertools import chain
+# TO DO:  FIX GET ALL BORDERS
 
 def pm(matrix,m,n):
     if type(matrix[0]) == int:
@@ -6,15 +6,6 @@ def pm(matrix,m,n):
             print (matrix[i*n : i*n + n])
     else:
         print('\n'.join([''.join([("{:"+str(m)+"}").format(item) for item in row]) for row in matrix]))
-
-def cycle(m,n):
-    r = 0
-    l = []
-    while m>=2 and n>=2:
-        l.append(2*((m+n)-2))
-        m-=2
-        n-=2
-    return l
 
 def flatten_border(matrix:list, m:int, n:int) -> list:
 
@@ -27,25 +18,53 @@ def flatten_border(matrix:list, m:int, n:int) -> list:
 
 def reconstruct_rotated_matrix(borders, m, n):
     # assuming the borders are already rotated r times
-    #for border in borders:
-        # we should put this border where it belongs on the original matrix
-        # matrix[0] = first row
-        # [matrix[i][0] for i in range(m)] = right border
-        # matrix[-1] = last row
-        # [matrix[i][-1] for i in range(m)] = left border
-    return 
+    
+    start = 0
+    matrix = [[0]*n]*m
+
+    for b in borders:
+
+        _m = b[0]
+        _n = b[1]
+
+        submatrix = [[0]*_n]*_m
+    
+        arr = borders[b]
+
+        first_row = arr[:_n]
+        arr = arr[_n-1:]
+        right_border = arr[:_m]
+        arr = arr[_m-1:]
+        last_row = arr[:_n][::-1]
+        arr = arr[_n-1:]
+        left_border = [first_row[0]] + arr[::-1]
+
+        submatrix[0] = first_row
+        submatrix[-1] = last_row
+
+        for i in range(1,_m-1):
+            submatrix[i] = [left_border[i]] + [0]*(_n-2) + [right_border[i]]
+        
+        if _m == m and _n == n:
+            matrix[:] = submatrix[:]
+        else:    
+            for i in range(start,m-start):
+                for j in range(start,n-start):
+                    matrix[i][j] =  submatrix[i-start][j-start]
+                
+        start += 1
+
+    return matrix
  
  
 def get_all_borders(matrix:list, m:int, n:int) -> list:
 
-    borders = []
+    borders = dict()
     _m,_n = m,n
     start = 0
     submatrix = matrix
     while 1:
-        print(submatrix)
-        print(f"m = {_m} n = {_n}")
-        borders.append(flatten_border(submatrix,_m,_n))
+        borders.update({(_m,_n) : flatten_border(submatrix,_m,_n)})
         start += 1
         _m -= 2
         _n -= 2
@@ -54,14 +73,20 @@ def get_all_borders(matrix:list, m:int, n:int) -> list:
             break
     return borders
 
+def matrixRotation(matrix, r):
+    m = len(matrix)
+    n = len(matrix[0])
+    borders = get_all_borders(matrix,m,n)
+    for b in borders:
+        borders[b] = borders[b][r:] + borders[b][:r]
+    return reconstruct_rotated_matrix(borders,m,n)
+
 m = 4
 n = 4
 r = 2
 matrix = [[1, 2, 3, 4], [5, 6, 7, 8], [9, 10, 11, 12], [13, 14, 15, 16]]
 matrix_2 = [[1,2,3,4], [7,8,9,10], [13,14,15,16], [19,20,21,22], [25,26,27,28]]
-mflat = [matrix[i][j] for i in range(m) for j in range(n)]
-initial_indices = list(range(n*m))
-pm(matrix,m,n)
 
-#print(flatten_border(matrix,m,n)) # -> [1,2,3,4,8,12,16,]
-print(get_all_borders(matrix_2,5,4))
+
+print(matrixRotation(matrix,1))
+
