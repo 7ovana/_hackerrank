@@ -1,4 +1,7 @@
-# TO DO:  FIX GET ALL BORDERS
+# Matrix Layer Rotation
+# 
+# difficulty: hard
+# maximum points: 80
 
 def pm(matrix:list, m:int, n:int):
     """ Print a given m*n matrix.
@@ -29,6 +32,7 @@ def get_all_outlines(matrix:list, m:int, n:int) -> list:
     _m,_n = m,n
     start = 0
     submatrix = matrix
+
     while 1:
         outlines.update({(_m,_n) : flatten_outline(submatrix,_m,_n)})
         start += 1
@@ -37,6 +41,7 @@ def get_all_outlines(matrix:list, m:int, n:int) -> list:
         submatrix = [submatrix[i][1:-1] for i in range(1,_m+1)]
         if _m == 0 or _n == 0:
             break
+
     return outlines
 
 def reconstruct_matrix(outlines:dict, m:int, n:int) -> list:
