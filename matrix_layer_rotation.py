@@ -1,13 +1,18 @@
 # TO DO:  FIX GET ALL BORDERS
 
-def pm(matrix,m,n):
+def pm(matrix:list, m:int, n:int):
+    """ Print a given m*n matrix.
+    """
+
     if type(matrix[0]) == int:
         for i in range(m):
             print (matrix[i*n : i*n + n])
     else:
         print('\n'.join([''.join([("{:"+str(m)+"}").format(item) for item in row]) for row in matrix]))
 
-def flatten_border(matrix:list, m:int, n:int) -> list:
+def flatten_outline(matrix:list, m:int, n:int) -> list:
+    """ Flatten the outline for a given m*n matrix.
+    """
 
     first_row = matrix[0]
     last_row = matrix[-1]
@@ -16,20 +21,39 @@ def flatten_border(matrix:list, m:int, n:int) -> list:
 
     return first_row[:-1] + right_border[:-1] + last_row[1:][::-1] + left_border[::-1][:-1]
 
-def reconstruct_rotated_matrix(borders, m, n):
-    # assuming the borders are already rotated r times
+def get_all_outlines(matrix:list, m:int, n:int) -> list:
+    """ Return all outlines of a m*n matrix.
+    """
+
+    outlines = dict()
+    _m,_n = m,n
+    start = 0
+    submatrix = matrix
+    while 1:
+        outlines.update({(_m,_n) : flatten_outline(submatrix,_m,_n)})
+        start += 1
+        _m -= 2
+        _n -= 2
+        submatrix = [submatrix[i][1:-1] for i in range(1,_m+1)]
+        if _m == 0 or _n == 0:
+            break
+    return outlines
+
+def reconstruct_matrix(outlines:dict, m:int, n:int) -> list:
+    """ Reconstruct matrix from its outlines.
+    """
     
     start = 0
     matrix = [[0]*n]*m
 
-    for b in borders:
+    for b in outlines:
 
         _m = b[0]
         _n = b[1]
 
         submatrix = [[0]*_n]*_m
     
-        arr = borders[b]
+        arr = outlines[b]
 
         first_row = arr[:_n]
         arr = arr[_n-1:]
@@ -55,38 +79,32 @@ def reconstruct_rotated_matrix(borders, m, n):
         start += 1
 
     return matrix
- 
- 
-def get_all_borders(matrix:list, m:int, n:int) -> list:
-
-    borders = dict()
-    _m,_n = m,n
-    start = 0
-    submatrix = matrix
-    while 1:
-        borders.update({(_m,_n) : flatten_border(submatrix,_m,_n)})
-        start += 1
-        _m -= 2
-        _n -= 2
-        submatrix = [submatrix[i][1:-1] for i in range(start,_m+1)]
-        if _m == 0 or _n == 0:
-            break
-    return borders
 
 def matrixRotation(matrix, r):
+    """ Rotate the matrix.
+    """
+
     m = len(matrix)
     n = len(matrix[0])
-    borders = get_all_borders(matrix,m,n)
-    for b in borders:
-        borders[b] = borders[b][r:] + borders[b][:r]
-    return reconstruct_rotated_matrix(borders,m,n)
 
-m = 4
-n = 4
-r = 2
-matrix = [[1, 2, 3, 4], [5, 6, 7, 8], [9, 10, 11, 12], [13, 14, 15, 16]]
-matrix_2 = [[1,2,3,4], [7,8,9,10], [13,14,15,16], [19,20,21,22], [25,26,27,28]]
+    outlines = get_all_outlines(matrix,m,n)
+
+    for b in outlines:
+        _m = b[0]
+        _n = b[1]
+        size = 2*((_m+_n)-2)
+        outlines[b] = outlines[b][r%size:] + outlines[b][:r%size]
+
+    rm = reconstruct_matrix(outlines,m,n)
+
+    [print(*rm[i]) for i in range(m)]
 
 
-print(matrixRotation(matrix,1))
+if __name__ == '__main__':
 
+    m = 4
+    n = 4
+    r = 2
+
+    matrix = [[1,2,3,4], [7,8,9,10], [13,14,15,16], [19,20,21,22], [25,26,27,28]]
+    matrixRotation(matrix,1)
