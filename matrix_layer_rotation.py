@@ -3,15 +3,6 @@
 # difficulty: hard
 # maximum points: 80
 
-def pm(matrix:list, m:int, n:int):
-    """ Print a given m*n matrix.
-    """
-
-    if type(matrix[0]) == int:
-        for i in range(m):
-            print (matrix[i*n : i*n + n])
-    else:
-        print('\n'.join([''.join([("{:"+str(m)+"}").format(item) for item in row]) for row in matrix]))
 
 def flatten_outline(matrix:list, m:int, n:int) -> list:
     """ Flatten the outline for a given m*n matrix.
